@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 
 import {
   FeedbackOptions,
@@ -30,15 +30,24 @@ export function App() {
     }
   };
 
-  const countTotalFeedback = () => {
-    return good + neutral + bad;
-  };
+  const total = useMemo(() => {
+    const countTotalFeedback = () => {
+      return good + neutral + bad;
+    };
+    return countTotalFeedback(good + neutral + bad);
+  }, [good, neutral, bad]);
 
-  const countPositiveFeedbackPercentage = () => {
-    const total = good + neutral + bad;
-    return Math.round((good * 100) / total) || 0;
-  };
-  const total = countTotalFeedback();
+  const positivePersantage = useMemo(() => {
+    const countPositiveFeedbackPercentage = () => {
+      const total = good + neutral + bad;
+      if (total === 0) {
+        return 0;
+      }
+      return Math.round((good * 100) / total);
+    };
+    return countPositiveFeedbackPercentage();
+  }, [good, neutral, bad]);
+
   return (
     <Container>
       <Section title="Please, leave your feedback">
@@ -51,7 +60,7 @@ export function App() {
             neutral={neutral}
             bad={bad}
             total={total}
-            positivePercentage={countPositiveFeedbackPercentage()}
+            positivePercentage={positivePersantage}
           />
         ) : (
           <Notification message="There is no feedback" />
